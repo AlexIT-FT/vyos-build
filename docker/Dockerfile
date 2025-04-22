@@ -1,4 +1,4 @@
-# Copyright (C) 2018-2024 VyOS maintainers and contributors
+# Copyright (C) 2018-2025 VyOS maintainers and contributors
 #
 # This program is free software; you can redistribute it and/or modify
 # in order to easy exprort images built to "external" world
@@ -18,7 +18,7 @@
 
 # This Dockerfile is installable on both x86, x86-64, armhf and arm64 systems
 ARG ARCH=
-FROM ${ARCH}debian:bookworm
+FROM ${ARCH}debian:bookworm-slim
 
 RUN grep "VERSION_ID" /etc/os-release || (echo 'VERSION_ID="12"' >> /etc/os-release)
 
@@ -237,6 +237,7 @@ RUN pip install --break-system-packages \
       iproute2 \
       libzmq3-dev \
       procps \
+      protobuf-compiler \
       python3 \
       python3-setuptools \
       python3-inotify \
@@ -254,6 +255,7 @@ RUN pip install --break-system-packages \
       python3-netaddr \
       python3-paramiko \
       python3-passlib \
+      python3-protobuf \
       python3-tabulate \
       python3-zmq \
       pylint \
@@ -367,9 +369,8 @@ RUN sed "s/^%sudo.*/%sudo\tALL=(ALL) NOPASSWD:ALL/g" -i /etc/sudoers && \
     echo "vyos_bld\tALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers && \
     chmod a+s /usr/sbin/useradd /usr/sbin/groupadd
 
-# Ensure sure all users have access to our OCAM and Go installation
-RUN echo "eval \$(opam env --root=/opt/opam --set-root)" >> /etc/skel/.bashrc && \
-    echo "export PATH=/opt/go/bin:\$PATH" >> /etc/skel/.bashrc
+# Ensure sure all users have access to Go
+RUN echo "export PATH=/opt/go/bin:\$PATH" >> /etc/skel/.bashrc
 
 # Rise upper limit for UID when working in an Active Direcotry integrated
 # environment. This solves the warning: vyos_bld's uid 1632000007 outside of the
